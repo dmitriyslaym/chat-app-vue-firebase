@@ -1,6 +1,6 @@
 <template>
   <div class="new-message">
-    <form v-on:submit="saveNewMessage">
+    <form v-on:submit.prevent="saveNewMessage">
       <div class="form-group">
         <label>Your name</label>
         <input v-model="name" name="name" type="text" class="form-control" placeholder="Your name">
@@ -26,8 +26,7 @@ export default {
     }
   },
   methods: {
-    saveNewMessage: function (event) {
-      event.preventDefault()
+    saveNewMessage: function () {
       getDBRef('messages').push({
         name: this.name,
         text: this.text,
