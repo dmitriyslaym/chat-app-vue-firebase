@@ -3,6 +3,7 @@
     <form v-on:submit.prevent="handleFormSubmit">
       <div class="form-group">
         <textarea
+          v-on:keypress="handleInputKeypress"
           id="message-form-input"
           v-model="text"
           class="form-control"
@@ -61,6 +62,12 @@ export default {
         }
         this.resetFormData()
       })
+    },
+
+    handleInputKeypress: function (event) {
+      if (event.key === 'Enter') {
+        this.handleFormSubmit()
+      }
     },
 
     handleFormSubmit: function () {
