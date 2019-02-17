@@ -1,31 +1,43 @@
 <template>
   <div class="new-message">
-    <form v-on:submit.prevent="saveNewMessage">
+    <form v-on:submit.prevent="handleFormSubmit">
       <div class="form-group">
-        <label>Your name</label>
-        <input v-model="name" name="name" type="text" class="form-control" placeholder="Your name">
+        <textarea
+          v-model="text"
+          class="form-control"
+          placeholder="Your message"
+          rows="3">
+        </textarea>
       </div>
-      <div class="form-group">
-        <label>Your message</label>
-        <input v-model="text" type="text" class="form-control" placeholder="Your message">
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary">{{ id ? 'Update' : 'Send New' }} Message</button>
     </form>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 import { getDBRef } from '../database'
 
 export default {
   name: 'NewMessage',
-  data () {
-    return {
-      text: '',
-      name: ''
+  computed: {
+    ...mapState({
+      id: state => state.messageForm.id,
+      name: state => state.auth.name
+    }),
+    text: {
+      get () {
+        console.log('this.$store.state.messageForm.text', this.$store.state.messageForm.text)
+        return this.$store.state.messageForm.text
+      },
+      set (value) {
+        this.updateFormData({ text: value, id: this.id })
+      }
     }
   },
   methods: {
+    ...mapMutations('messageForm', ['updateFormData', 'resetFormData']),
+
     saveNewMessage: function () {
       getDBRef('messages').push({
         name: this.name,
@@ -35,9 +47,24 @@ export default {
         if (error) {
           throw new Error('Can not send the message')
         }
-        this.name = ''
-        this.text = ''
+        this.resetFormData()
       })
+    },
+
+    updateMessage: function () {
+      getDBRef('messages').child(this.id).update({
+        text: this.text,
+        updatedAt: Date.now()
+      }, (error) => {
+        if (error) {
+          throw new Error('Can not update the message')
+        }
+        this.resetFormData()
+      })
+    },
+
+    handleFormSubmit: function () {
+      this.id ? this.updateMessage() : this.saveNewMessage()
     }
   }
 }
@@ -45,5 +72,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+  .new-message {
+    margin-top: 10px;
+  }
 </style>
