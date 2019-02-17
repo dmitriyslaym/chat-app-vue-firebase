@@ -3,6 +3,7 @@
     <form v-on:submit.prevent="handleFormSubmit">
       <div class="form-group">
         <textarea
+          id="message-form-input"
           v-model="text"
           class="form-control"
           placeholder="Your message"
@@ -27,7 +28,6 @@ export default {
     }),
     text: {
       get () {
-        console.log('this.$store.state.messageForm.text', this.$store.state.messageForm.text)
         return this.$store.state.messageForm.text
       },
       set (value) {

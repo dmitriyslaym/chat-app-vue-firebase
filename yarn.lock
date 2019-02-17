@@ -6443,6 +6443,11 @@ svgo@^0.7.0:
     sax "~1.2.1"
     whet.extend "~0.9.9"
 
+sweetalert2@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-8.2.0.tgz#6f4fcb3749847017602605fe856712a4c532f37a"
+  integrity sha512-HwrBqw3ztde7inQMeyd8uUTXu9hThI4myNOmG2P0RWLoOmCu8FZMCNg6oyvLG/rZtzlsfgyaG4xo5E0pJkcwHA==
+
 table@4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/table/-/table-4.0.2.tgz#a33447375391e766ad34d3486e6e2aedc84d2e36"
