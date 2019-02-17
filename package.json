@@ -6,9 +6,9 @@
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-    "start": "yarn dev",
+    "start": "node server.js",
     "lint": "eslint --ext .js,.vue src",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "npm lint --fix",
     "build": "node build/build.js"
   },
   "dependencies": {

@@ -1,7 +1,7 @@
 <template>
   <div class="messages" id="messages">
 
-    <div v-if="!messagesList.length" class="messages__loader d-flex justify-content-center">
+    <div v-if="!messagesList.length || !name" class="messages__loader d-flex justify-content-center">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
       </div>
