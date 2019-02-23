@@ -1,1 +1,4 @@
-export const localStorageNameKey = 'slaym-chat-name'
+export const authMode = {
+  signUp: 'Sign Up',
+  signIn: 'Sign In'
+}

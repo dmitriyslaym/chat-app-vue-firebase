@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <div class="main-icon"></div>
-    <SignUp v-if="!userId"/>
-    <UserHeader v-else />
-    <Messages/>
-    <NewMessage/>
+    <AuthForm v-if="!userId"/>
+    <div v-else>
+      <UserHeader />
+      <Messages/>
+      <NewMessage/>
+    </div>
   </div>
 </template>
 
@@ -12,7 +14,7 @@
 import { mapMutations, mapState } from 'vuex'
 import Messages from './components/Messages'
 import NewMessage from './components/NewMessage'
-import SignUp from './components/SignUp'
+import AuthForm from './components/AuthForm'
 import UserHeader from './components/UserHeader'
 
 export default {
@@ -21,7 +23,7 @@ export default {
     UserHeader,
     Messages,
     NewMessage,
-    SignUp
+    AuthForm
   },
   computed: {
     ...mapState({

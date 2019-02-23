@@ -28,18 +28,22 @@ const mutations = {
   }
 }
 
+const commitUserData = ({ context, user }) => {
+  const { providerData } = user
+  context.commit('setUserData', {
+    name,
+    image: providerData[0].photoURL,
+    email: providerData[0].email,
+    id: user.uid,
+    updateProfile: user.updateProfile.bind(user)
+  })
+}
+
 const actions = {
   signUpWithEmail (context, { email, password, name }) {
     window.firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(({ user }) => {
-        const { providerData } = user
-        context.commit('setUserData', {
-          name,
-          image: providerData[0].photoURL,
-          email: providerData[0].email,
-          id: user.uid,
-          updateProfile: user.updateProfile.bind(user)
-        })
+        commitUserData({ context, user })
         user.updateProfile({ displayName: name })
       })
       .then((data) => {
@@ -49,13 +53,22 @@ const actions = {
         console.log('sign up error', error)
       })
   },
+  signInWithEmail (context, { email, password }) {
+    window.firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(({ user }) => {
+        commitUserData({ context, user })
+      })
+      .catch((error) => {
+        console.log('sign in error', error)
+      })
+  },
   signOut (context) {
     window.firebase.auth().signOut()
       .then(() => {
-        context.commit('resetUserData');
+        context.commit('resetUserData')
       })
       .catch(error => {
-        // An error happened.
+        console.log('error', error)
       })
   }
 }
