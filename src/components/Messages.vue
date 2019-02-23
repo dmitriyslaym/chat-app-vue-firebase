@@ -70,7 +70,7 @@ export default {
     },
     ...mapState({
       messageIdForEditMode: state => state.messageForm.id,
-      name: state => state.auth.name
+      name: state => state.user.name
     })
   },
   methods: {

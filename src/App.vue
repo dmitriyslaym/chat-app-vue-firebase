@@ -1,40 +1,52 @@
 <template>
   <div id="app">
     <div class="main-icon"></div>
+    <SignUp v-if="!userId"/>
+    <UserHeader v-else />
     <Messages/>
     <NewMessage/>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import swal from 'sweetalert2'
+import { mapMutations, mapState } from 'vuex'
 import Messages from './components/Messages'
 import NewMessage from './components/NewMessage'
-import { localStorageNameKey } from './const'
+import SignUp from './components/SignUp'
+import UserHeader from './components/UserHeader'
 
 export default {
   name: 'App',
   components: {
+    UserHeader,
     Messages,
-    NewMessage
+    NewMessage,
+    SignUp
+  },
+  computed: {
+    ...mapState({
+      userId: state => state.user.id
+    })
   },
   methods: {
-    ...mapActions('auth', ['auth', 'setName'])
+    ...mapMutations('user', ['setUserData', 'resetUserData'])
   },
   created () {
-    if (!localStorage.getItem(localStorageNameKey)) {
-      swal.fire({
-        title: 'Please provide your name',
-        input: 'text',
-        inputValue: '',
-        inputValidator: (value) => {
-          return !value && 'Please use some name'
-        }
-      }).then(response => {
-        this.setName(response.value)
-      })
-    }
+    window.firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        const { providerData, uid } = user
+        const { displayName, photoURL, email } = providerData[0]
+        this.setUserData({
+          name: displayName,
+          image: photoURL,
+          email,
+          id: uid,
+          updateProfile: user.updateProfile.bind(user)
+        })
+      } else {
+        this.resetUserData()
+      }
+    })
   }
 }
 </script>
