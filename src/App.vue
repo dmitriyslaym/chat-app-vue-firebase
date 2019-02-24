@@ -9,6 +9,7 @@
       <div class="main-icon"></div>
       <AuthForm v-if="!userId" />
       <div v-else>
+        <Users />
         <UserHeader />
         <Messages/>
         <NewMessage/>
@@ -23,6 +24,7 @@ import Messages from './components/Messages'
 import NewMessage from './components/NewMessage'
 import AuthForm from './components/AuthForm'
 import UserHeader from './components/UserHeader'
+import Users from './components/Users'
 
 export default {
   name: 'App',
@@ -30,7 +32,8 @@ export default {
     UserHeader,
     Messages,
     NewMessage,
-    AuthForm
+    AuthForm,
+    Users
   },
   data: () => ({
     isAuthLoaded: false

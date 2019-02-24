@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { getDBRef } from '../../database'
 
 Vue.use(Vuex)
 
@@ -14,7 +15,6 @@ const state = {
 
 const mutations = {
   setIsAuthorizing (state, isAuthorizing) {
-    console.log('setIsAuthorizing mutations', isAuthorizing)
     state.isAuthorizing = isAuthorizing
   },
   setUserData (state, { id, name, image, email, updateProfile }) {
@@ -49,6 +49,12 @@ const actions = {
     window.firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(({ user }) => user.updateProfile({ displayName: name }).then(() => user))
       .then((user) => {
+        return getDBRef(`users/${user.uid}`).set({
+          name,
+          id: user.uid
+        }).then(responseFromAddNewUser => ({ responseFromAddNewUser, user }))
+      })
+      .then(({ user }) => {
         commitUserData({ context, user, name })
       })
       .catch((error) => {
