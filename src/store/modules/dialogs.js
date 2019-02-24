@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 const state = {
   selectedDialog: '',
-  messages: {}
+  messages: {},
+  typingUsers: {}
 }
 
 const mutations = {
@@ -17,6 +18,12 @@ const mutations = {
     state.messages = {
       ...state.messages,
       [message.key]: message.val
+    }
+  },
+  updateTypingUser: function (state, { userId, isTyping }) {
+    state.typingUsers = {
+      ...state.typingUsers,
+      [userId]: isTyping
     }
   }
 }
@@ -39,6 +46,17 @@ const actions = {
     getDBRef(path).on('child_removed', (snapshot) => {
       context.commit('updateMessage', { message: { key: snapshot.key, val: null } })
     })
+
+    getDBRef(`dialogs/${selectedDialog}/typingUsers`).on('child_added', (snapshot) => {
+      context.commit('updateTypingUser', { userId: snapshot.key, isTyping: snapshot.val() })
+    })
+    getDBRef(`dialogs/${selectedDialog}/typingUsers`).on('child_changed', (snapshot) => {
+      context.commit('updateTypingUser', { userId: snapshot.key, isTyping: snapshot.val() })
+    })
+  },
+
+  saveTypingUser (context, { userId, isTyping }) {
+    getDBRef(`dialogs/${context.state.selectedDialog}/typingUsers`).update({ [userId]: isTyping })
   }
 }
 

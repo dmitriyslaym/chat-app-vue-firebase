@@ -60,12 +60,10 @@ import { getDBRef } from '../database'
 export default {
   name: 'Messages',
   computed: {
-    messagesList: function () {
-      return Object.values(this.messages).filter(message => message)
-    },
     ...mapState({
       messageIdForEditMode: state => state.messageForm.id,
       currentUserId: state => state.auth.id,
+      messagesMap: state => state.dialogs.messages,
       messagesList: state => Object.values(state.dialogs.messages).filter(message => message),
       selectedDialog: state => state.dialogs.selectedDialog
     })
@@ -74,12 +72,12 @@ export default {
     ...mapMutations('messageForm', ['updateFormData', 'resetFormData']),
 
     deleteMessage: function ({ id }) {
-      getDBRef(this.selectedDialog).child(id).remove()
+      getDBRef(`dialogs/${this.selectedDialog}/messages`).child(id).remove()
     },
 
     openEditMessageMode: function ({ id }) {
       this.updateFormData({
-        text: this.messages[id].text,
+        text: this.messagesMap[id].text,
         id: id
       })
 

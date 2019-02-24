@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import { getDBRef } from '../database'
 import { getDialogId } from '../utils'
 
@@ -33,19 +33,17 @@ export default {
   name: 'Users',
   data () {
     return {
-      users: {},
       isUsersListVisible: false
     }
   },
   computed: {
     ...mapState({
-      currentUserId: state => state.auth.id
-    }),
-    usersList: function () {
-      return Object.values(this.users).filter(user => user.id !== this.currentUserId)
-    }
+      currentUserId: state => state.auth.id,
+      usersList: state => Object.values(state.users.usersMap).filter(({ id }) => id !== this.currentUserId)
+    })
   },
   methods: {
+    ...mapMutations('users', ['saveNewUserInStore']),
     ...mapActions('dialogs', ['loadDialogMessages']),
     toggleUsersList: function () {
       this.isUsersListVisible = !this.isUsersListVisible
@@ -57,9 +55,8 @@ export default {
   },
   created () {
     getDBRef('users').on('child_added', (snapshot) => {
-      this.users = {
-        ...this.users,
-        [snapshot.key]: snapshot.val()
+      if (snapshot.key !== this.currentUserId) {
+        this.saveNewUserInStore({ user: snapshot.val() })
       }
     })
   }
@@ -80,6 +77,8 @@ export default {
     list-style: none;
     padding: 0;
     margin: 0;
+    height: 300px;
+    width: 300px;
   }
 
   .user-item {

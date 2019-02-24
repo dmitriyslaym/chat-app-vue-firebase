@@ -10,7 +10,6 @@
         <Users v-if="userId" />
         <div class="main-icon"></div>
       </div>
-
       <AuthForm v-if="!userId" />
       <div v-else>
         <UserHeader />
@@ -18,6 +17,7 @@
           <Messages/>
           <NewMessage/>
         </div>
+        <h3 v-else>Please select a user to start a dialog with</h3>
       </div>
     </div>
   </div>
@@ -98,10 +98,10 @@ export default {
   .main-icon {
     background-image: URL('https://homkin.ru/wp-content/uploads/2018/06/pig27.jpg');
     background-repeat: no-repeat;
-    background-size: 325px;
+    background-size: 290px;
     background-position: center;
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     margin-left: auto;
     margin-right: auto;
