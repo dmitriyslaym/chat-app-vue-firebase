@@ -6,13 +6,18 @@
       </div>
     </div>
     <div v-else class="app-container">
-      <div class="main-icon"></div>
+      <div class="app-header">
+        <Users v-if="userId" />
+        <div class="main-icon"></div>
+      </div>
+
       <AuthForm v-if="!userId" />
       <div v-else>
-        <Users />
         <UserHeader />
-        <Messages/>
-        <NewMessage/>
+        <div v-if="selectedDialog">
+          <Messages/>
+          <NewMessage/>
+        </div>
       </div>
     </div>
   </div>
@@ -41,7 +46,8 @@ export default {
   computed: {
     ...mapState({
       userId: state => state.auth.id,
-      isAuthorizing: state => state.auth.isAuthorizing
+      isAuthorizing: state => state.auth.isAuthorizing,
+      selectedDialog: state => state.dialogs.selectedDialog
     })
   },
   methods: {
@@ -115,6 +121,6 @@ export default {
   }
 
   .app-container {
-    margin-top: 60px;
+    margin-top: 20px;
   }
 </style>

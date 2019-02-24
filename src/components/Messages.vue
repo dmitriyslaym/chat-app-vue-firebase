@@ -1,7 +1,7 @@
 <template>
   <div class="messages" id="messages">
 
-    <div v-if="!messagesList.length || !name" class="messages__loader d-flex justify-content-center">
+    <div v-if="!messagesList.length" class="messages__loader d-flex justify-content-center">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
       </div>
@@ -11,16 +11,16 @@
       v-else
       :key="message.timestamp"
       class="message"
-      v-bind:class="{isReply: message.name !== name, isSender: message.name === name}"
+      v-bind:class="{isReply: message.userId !== currentUserId, isSender: message.userId === currentUserId}"
       v-for="message in messagesList"
     >
       <div class="message__content">
-        <span class="message__icon" v-if="message.name !== name">{{ message.name.charAt(0) }}</span>
+        <span class="message__icon" v-if="message.userId !== currentUserId">{{ message.userName.charAt(0) }}</span>
         <div v-bind:class="{edit: message.id === messageIdForEditMode}" class="message__text">
           <span>
             {{ message.text.trim() }}
           </span>
-          <div v-if="message.name === name" class="message__text-icons">
+          <div v-if="message.userId === currentUserId" class="message__text-icons">
             <div v-if="message.id !== messageIdForEditMode">
               <font-awesome-icon
                 class="message__text-icon"
@@ -59,25 +59,22 @@ import { getDBRef } from '../database'
 
 export default {
   name: 'Messages',
-  data () {
-    return {
-      messages: {}
-    }
-  },
   computed: {
     messagesList: function () {
       return Object.values(this.messages).filter(message => message)
     },
     ...mapState({
       messageIdForEditMode: state => state.messageForm.id,
-      name: state => state.auth.name
+      currentUserId: state => state.auth.id,
+      messagesList: state => Object.values(state.dialogs.messages).filter(message => message),
+      selectedDialog: state => state.dialogs.selectedDialog
     })
   },
   methods: {
     ...mapMutations('messageForm', ['updateFormData', 'resetFormData']),
 
     deleteMessage: function ({ id }) {
-      getDBRef('messages').child(id).remove()
+      getDBRef(this.selectedDialog).child(id).remove()
     },
 
     openEditMessageMode: function ({ id }) {
@@ -92,21 +89,6 @@ export default {
     cancelEditMessageMode: function () {
       this.resetFormData()
     }
-  },
-  created () {
-    getDBRef('messages').on('child_added', (snapshot) => {
-      this.messages = { ...this.messages, [snapshot.key]: { ...snapshot.val(), id: snapshot.key } }
-      setTimeout(() => {
-        const messagesEl = document.getElementById('messages')
-        messagesEl.scrollTop = messagesEl.scrollHeight
-      }, 100)
-    })
-    getDBRef('messages').on('child_changed', (snapshot) => {
-      this.messages = { ...this.messages, [snapshot.key]: { ...snapshot.val(), id: snapshot.key } }
-    })
-    getDBRef('messages').on('child_removed', (snapshot) => {
-      this.messages = { ...this.messages, [snapshot.key]: null }
-    })
   }
 }
 </script>

@@ -25,7 +25,9 @@ export default {
   computed: {
     ...mapState({
       id: state => state.messageForm.id,
-      name: state => state.auth.name
+      userName: state => state.auth.name,
+      userId: state => state.auth.id,
+      dialogsDBPath: state => `dialogs/${state.dialogs.selectedDialog}/messages`
     }),
     text: {
       get () {
@@ -40,8 +42,9 @@ export default {
     ...mapMutations('messageForm', ['updateFormData', 'resetFormData']),
 
     saveNewMessage: function () {
-      getDBRef('messages').push({
-        name: this.name,
+      getDBRef(this.dialogsDBPath).push({
+        userName: this.userName,
+        userId: this.userId,
         text: this.text,
         timestamp: Date.now()
       }, (error) => {
@@ -53,7 +56,7 @@ export default {
     },
 
     updateMessage: function () {
-      getDBRef('messages').child(this.id).update({
+      getDBRef(this.dialogsDBPath).child(this.id).update({
         text: this.text,
         updatedAt: Date.now()
       }, (error) => {
