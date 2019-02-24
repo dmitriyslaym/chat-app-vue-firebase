@@ -1,11 +1,18 @@
 <template>
   <div id="app">
-    <div class="main-icon"></div>
-    <AuthForm v-if="!userId"/>
-    <div v-else>
-      <UserHeader />
-      <Messages/>
-      <NewMessage/>
+    <div v-if="!isAuthLoaded" class="page-loader-wrapper">
+      <div class="spinner-grow" style="width: 5rem; height: 5rem;" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div v-else class="app-container">
+      <div class="main-icon"></div>
+      <AuthForm v-if="!userId" />
+      <div v-else>
+        <UserHeader />
+        <Messages/>
+        <NewMessage/>
+      </div>
     </div>
   </div>
 </template>
@@ -25,28 +32,38 @@ export default {
     NewMessage,
     AuthForm
   },
+  data: () => ({
+    isAuthLoaded: false
+  }),
   computed: {
     ...mapState({
-      userId: state => state.user.id
+      userId: state => state.auth.id,
+      isAuthorizing: state => state.auth.isAuthorizing
     })
   },
   methods: {
-    ...mapMutations('user', ['setUserData', 'resetUserData'])
+    ...mapMutations('auth', ['setUserData', 'resetUserData'])
   },
   created () {
     window.firebase.auth().onAuthStateChanged((user) => {
+      if (!this.isAuthLoaded) {
+        this.isAuthLoaded = true
+      }
+
       if (user) {
-        const { providerData, uid } = user
-        const { displayName, photoURL, email } = providerData[0]
-        this.setUserData({
-          name: displayName,
-          image: photoURL,
-          email,
-          id: uid,
-          updateProfile: user.updateProfile.bind(user)
-        })
+        if (!this.userId && !this.isAuthorizing) {
+          const { providerData, uid } = user
+          const { displayName, photoURL, email } = providerData[0]
+          this.setUserData({
+            name: displayName,
+            image: photoURL,
+            email,
+            id: uid,
+            updateProfile: user.updateProfile.bind(user)
+          })
+        }
       } else {
-        this.resetUserData()
+        this.userId && this.resetUserData()
       }
     })
   }
@@ -54,27 +71,47 @@ export default {
 </script>
 
 <style>
-.main-icon {
-  background-image: URL('https://homkin.ru/wp-content/uploads/2018/06/pig27.jpg');
-  background-repeat: no-repeat;
-  background-size: 402px;
-  background-position: center;
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 10px;
-}
+  html {
+    height: 100%;
+  }
 
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  width: 75%;
-  min-width: 450px;
-  margin: 60px auto 0 auto;
-}
+  body {
+    height: 100%;
+  }
+
+  .page-loader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .main-icon {
+    background-image: URL('https://homkin.ru/wp-content/uploads/2018/06/pig27.jpg');
+    background-repeat: no-repeat;
+    background-size: 325px;
+    background-position: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+  }
+
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    width: 75%;
+    min-width: 450px;
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  .app-container {
+    margin-top: 60px;
+  }
 </style>

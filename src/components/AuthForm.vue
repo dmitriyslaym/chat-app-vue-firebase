@@ -14,7 +14,15 @@
         <label for="user-password">Password</label>
         <input v-model="password" type="password" class="form-control" id="user-password" placeholder="Password">
       </div>
-      <button type="submit" class="btn btn-primary">{{ mode }}</button>
+      <button type="submit" class="btn btn-primary" v-bind:disabled="isAuthorizing">
+        <span v-if="!isAuthorizing">
+          {{ mode }}
+        </span>
+        <span v-else>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Authorizing...
+        </span>
+      </button>
     </form>
     <div class="dropdown-divider"></div>
     <div v-if="mode === authMode.signIn">
@@ -28,7 +36,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import { authMode } from '../const'
 
 export default {
@@ -42,8 +50,14 @@ export default {
       mode: authMode.signIn
     }
   },
+  computed: {
+    ...mapState({
+      isAuthorizing: state => state.auth.isAuthorizing
+    })
+  },
   methods: {
-    ...mapActions('user', ['signUpWithEmail', 'signInWithEmail']),
+    ...mapActions('auth', ['signUpWithEmail', 'signInWithEmail']),
+    ...mapMutations('auth', ['setIsAuthorizing']),
     setMode: function (mode) {
       this.mode = mode
     },
@@ -54,7 +68,8 @@ export default {
       this.signUpWithEmail({ email: this.email, password: this.password, name: this.name })
     },
     handleFormSubmit: function () {
-      this.mode === authMode.signIn ? this.signIn() : this.signOut()
+      this.setIsAuthorizing(true)
+      this.mode === authMode.signIn ? this.signIn() : this.signUp()
     }
   }
 }

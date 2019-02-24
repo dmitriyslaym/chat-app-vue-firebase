@@ -8,10 +8,15 @@ const state = {
   name: '',
   image: '',
   email: '',
-  updateProfile: undefined
+  updateProfile: undefined,
+  isAuthorizing: false
 }
 
 const mutations = {
+  setIsAuthorizing (state, isAuthorizing) {
+    console.log('setIsAuthorizing mutations', isAuthorizing)
+    state.isAuthorizing = isAuthorizing
+  },
   setUserData (state, { id, name, image, email, updateProfile }) {
     state.id = id
     state.name = name
@@ -28,10 +33,10 @@ const mutations = {
   }
 }
 
-const commitUserData = ({ context, user }) => {
+const commitUserData = ({ context, user, name }) => {
   const { providerData } = user
   context.commit('setUserData', {
-    name,
+    name: name || providerData[0].displayName,
     image: providerData[0].photoURL,
     email: providerData[0].email,
     id: user.uid,
@@ -42,15 +47,15 @@ const commitUserData = ({ context, user }) => {
 const actions = {
   signUpWithEmail (context, { email, password, name }) {
     window.firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(({ user }) => {
-        commitUserData({ context, user })
-        user.updateProfile({ displayName: name })
-      })
-      .then((data) => {
-        console.log('name has been updated', data)
+      .then(({ user }) => user.updateProfile({ displayName: name }).then(() => user))
+      .then((user) => {
+        commitUserData({ context, user, name })
       })
       .catch((error) => {
         console.log('sign up error', error)
+      })
+      .finally(() => {
+        context.commit('setIsAuthorizing', false)
       })
   },
   signInWithEmail (context, { email, password }) {
@@ -60,6 +65,9 @@ const actions = {
       })
       .catch((error) => {
         console.log('sign in error', error)
+      })
+      .finally(() => {
+        context.commit('setIsAuthorizing', false)
       })
   },
   signOut (context) {

@@ -1,6 +1,6 @@
 <template>
   <div class="user-header">
-    <h2>Hello {{ userName }}</h2>
+    <h2 class="user-header__text">Hello, {{ userName }}!</h2>
     <button type="button" v-on:click="initSignOut" class="btn btn-primary">Sign Out</button>
   </div>
 </template>
@@ -12,11 +12,11 @@ export default {
   name: 'UserHeader',
   computed: {
     ...mapState({
-      userName: state => state.user.name
+      userName: state => state.auth.name
     })
   },
   methods: {
-    ...mapActions('user', ['signOut']),
+    ...mapActions('auth', ['signOut']),
     initSignOut: function () {
       this.signOut()
     }
@@ -25,5 +25,13 @@ export default {
 </script>
 
 <style scoped>
-
+  .user-header {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .user-header__text {
+    margin-right: 10px;
+  }
 </style>
