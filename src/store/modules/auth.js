@@ -10,7 +10,8 @@ const state = {
   image: '',
   email: '',
   updateProfile: undefined,
-  isAuthorizing: false
+  isAuthorizing: false,
+  error: ''
 }
 
 const mutations = {
@@ -30,6 +31,9 @@ const mutations = {
     state.image = ''
     state.email = ''
     state.updateProfile = undefined
+  },
+  setError (state, { error }) {
+    state.error = error
   }
 }
 
@@ -58,7 +62,7 @@ const actions = {
         commitUserData({ context, user, name })
       })
       .catch((error) => {
-        console.log('sign up error', error)
+        context.commit('setError', { error: error.message })
       })
       .finally(() => {
         context.commit('setIsAuthorizing', false)
@@ -70,7 +74,7 @@ const actions = {
         commitUserData({ context, user })
       })
       .catch((error) => {
-        console.log('sign in error', error)
+        context.commit('setError', { error: error.message })
       })
       .finally(() => {
         context.commit('setIsAuthorizing', false)
@@ -82,7 +86,7 @@ const actions = {
         context.commit('resetUserData')
       })
       .catch(error => {
-        console.log('error', error)
+        context.commit('setError', { error: error.message })
       })
   }
 }

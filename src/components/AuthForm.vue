@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form v-on:submit.prevent="handleFormSubmit">
+    <form class="auth-form" v-on:submit.prevent="handleFormSubmit">
       <div v-if="mode === authMode.signUp" class="form-group">
         <label for="user-name">Name</label>
         <input v-model="name" type="text" class="form-control" id="user-name" placeholder="Name">
@@ -14,7 +14,7 @@
         <label for="user-password">Password</label>
         <input v-model="password" type="password" class="form-control" id="user-password" placeholder="Password">
       </div>
-      <button id="auth-button"  data-tippy="test" type="submit" class="btn btn-primary" v-bind:disabled="isAuthorizing">
+      <button type="submit" class="btn btn-primary" v-bind:disabled="isAuthorizing">
         <span v-if="!isAuthorizing">
           {{ mode }}
         </span>
@@ -31,6 +31,9 @@
     </div>
     <div v-else>
       <a v-on:click.prevent="setMode(authMode.signIn)" class="dropdown-item" href="#">Already have account? Sign in</a>
+    </div>
+    <div v-if="error" class="auth-error">
+      {{ error }}
     </div>
   </div>
 </template>
@@ -52,7 +55,8 @@ export default {
   },
   computed: {
     ...mapState({
-      isAuthorizing: state => state.auth.isAuthorizing
+      isAuthorizing: state => state.auth.isAuthorizing,
+      error: state => state.auth.error
     })
   },
   methods: {
@@ -76,5 +80,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .auth-error {
+    border: 1px solid red;
+    padding: 10px;
+  }
 </style>
