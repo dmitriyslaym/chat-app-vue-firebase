@@ -1,7 +1,7 @@
 <template>
   <div class="user-header">
     <h2 class="user-header__text">Hello, {{ userName }}!</h2>
-    <button type="button" v-on:click="initSignOut" class="btn btn-primary">Sign Out</button>
+    <button type="button" v-on:click="initLogOut" class="btn btn-primary">Log Out</button>
   </div>
 </template>
 
@@ -16,9 +16,10 @@ export default {
     })
   },
   methods: {
-    ...mapActions('auth', ['signOut']),
-    initSignOut: function () {
+    ...mapActions('auth', ['signOut', 'resetDialogs']),
+    initLogOut: function () {
       this.signOut()
+      this.resetDialogs()
     }
   }
 }

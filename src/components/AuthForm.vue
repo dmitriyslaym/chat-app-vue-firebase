@@ -14,7 +14,7 @@
         <label for="user-password">Password</label>
         <input v-model="password" type="password" class="form-control" id="user-password" placeholder="Password">
       </div>
-      <button type="submit" class="btn btn-primary" v-bind:disabled="isAuthorizing">
+      <button id="auth-button"  data-tippy="test" type="submit" class="btn btn-primary" v-bind:disabled="isAuthorizing">
         <span v-if="!isAuthorizing">
           {{ mode }}
         </span>

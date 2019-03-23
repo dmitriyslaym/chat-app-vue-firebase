@@ -3,9 +3,10 @@
     <form v-on:submit.prevent="handleFormSubmit">
       <div class="form-group new-message-form">
         <textarea
-          v-on:keypress="handleInputKeypress"
+          v-on:keypress.13="handleFormSubmit"
           id="message-form-input"
-          v-model="text"
+          v-bind:value="messageText"
+          v-on:input="handleInputChange"
           class="form-control"
           placeholder="Your message"
           rows="3">
@@ -27,6 +28,10 @@ import { getDBRef } from '../database'
 
 export default {
   name: 'NewMessage',
+  data: () => ({
+    messageText: '',
+    currentUserIsTyping: false
+  }),
   computed: {
     ...mapState({
       id: state => state.messageForm.id,
@@ -43,57 +48,54 @@ export default {
         }
         return [...res, this.users[userId].name]
       }, [])
-    },
-    text: {
-      get () {
-        return this.$store.state.messageForm.text
-      },
-      set (value) {
-        if (value && !this.typingUsers[this.userId]) {
-          this.saveTypingUser({ userId: this.userId, isTyping: true })
-        }
-        if (!value) {
-          this.saveTypingUser({ userId: this.userId, isTyping: false })
-        }
-
-        this.updateFormData({ text: value, id: this.id })
-      }
     }
   },
   methods: {
     ...mapMutations('messageForm', ['updateFormData', 'resetFormData']),
     ...mapActions('dialogs', ['saveTypingUser']),
 
+    afterSuccessSubmit: function () {
+      this.resetFormData()
+      this.messageText = ''
+    },
+
+    handleInputChange: function ({ target: { value } }) {
+      this.messageText = value
+      let needUpdateIsTyping = false
+      if (!this.currentUserIsTyping && value) {
+        needUpdateIsTyping = true
+        this.currentUserIsTyping = true
+      } else if (!value) {
+        needUpdateIsTyping = true
+        this.currentUserIsTyping = false
+      }
+      needUpdateIsTyping && this.saveTypingUser({ userId: this.userId, isTyping: this.currentUserIsTyping })
+    },
+
     saveNewMessage: function () {
       getDBRef(this.dialogsDBPath).push({
         userName: this.userName,
         userId: this.userId,
-        text: this.text,
+        text: this.messageText,
         timestamp: Date.now()
       }, (error) => {
         if (error) {
           throw new Error('Can not send the message')
         }
-        this.resetFormData()
+        this.afterSuccessSubmit()
       })
     },
 
     updateMessage: function () {
       getDBRef(this.dialogsDBPath).child(this.id).update({
-        text: this.text,
+        text: this.messageText,
         updatedAt: Date.now()
       }, (error) => {
         if (error) {
           throw new Error('Can not update the message')
         }
-        this.resetFormData()
+        this.afterSuccessSubmit()
       })
-    },
-
-    handleInputKeypress: function (event) {
-      if (event.key === 'Enter') {
-        this.handleFormSubmit()
-      }
     },
 
     handleFormSubmit: function () {

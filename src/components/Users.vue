@@ -39,7 +39,7 @@ export default {
   computed: {
     ...mapState({
       currentUserId: state => state.auth.id,
-      usersList: state => Object.values(state.users.usersMap).filter(({ id }) => id !== this.currentUserId)
+      usersList: state => Object.values(state.users.usersMap).filter(({ id }) => id !== state.auth.id)
     })
   },
   methods: {

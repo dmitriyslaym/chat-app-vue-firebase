@@ -10,6 +10,11 @@ const state = {
   typingUsers: {}
 }
 
+const dbPath = {
+  messages: '',
+  typingUsers: ''
+}
+
 const mutations = {
   updateSelectedDialog: function (state, { selectedDialog }) {
     state.selectedDialog = selectedDialog
@@ -25,38 +30,63 @@ const mutations = {
       ...state.typingUsers,
       [userId]: isTyping
     }
+  },
+  resetDialogsData: function (state) {
+    state.selectedDialog = ''
+    state.messages = {}
+    state.typingUsers = {}
+  }
+}
+
+function resetDialogs (context) {
+  context.commit('resetDialogsData')
+
+  if (dbPath.messages && dbPath.typingUsers) {
+    getDBRef(dbPath.messages).off('child_added')
+    getDBRef(dbPath.messages).off('child_changed')
+    getDBRef(dbPath.messages).off('child_removed')
+    getDBRef(dbPath.typingUsers).off('child_added')
+    getDBRef(dbPath.typingUsers).off('child_changed')
+    dbPath.messages = ''
+    dbPath.typingUsers = ''
   }
 }
 
 const actions = {
   loadDialogMessages (context, { selectedDialog }) {
+    resetDialogs(context)
+
     context.commit('updateSelectedDialog', { selectedDialog })
-    // TODO Need to reset previous subscription
-    const path = `dialogs/${selectedDialog}/messages`
-    getDBRef(path).on('child_added', (snapshot) => {
+    dbPath.messages = `dialogs/${selectedDialog}/messages`
+    dbPath.typingUsers = `dialogs/${selectedDialog}/typingUsers`
+    getDBRef(dbPath.messages).on('child_added', (snapshot) => {
       context.commit('updateMessage', { message: { key: snapshot.key, val: { ...snapshot.val(), id: snapshot.key } } })
       setTimeout(() => {
         const messagesEl = document.getElementById('messages')
         messagesEl.scrollTop = messagesEl.scrollHeight
       }, 100)
     })
-    getDBRef(path).on('child_changed', (snapshot) => {
+    getDBRef(dbPath.messages).on('child_changed', (snapshot) => {
       context.commit('updateMessage', { message: { key: snapshot.key, val: { ...snapshot.val(), id: snapshot.key } } })
     })
-    getDBRef(path).on('child_removed', (snapshot) => {
+    getDBRef(dbPath.messages).on('child_removed', (snapshot) => {
       context.commit('updateMessage', { message: { key: snapshot.key, val: null } })
     })
 
-    getDBRef(`dialogs/${selectedDialog}/typingUsers`).on('child_added', (snapshot) => {
+    getDBRef(dbPath.typingUsers).on('child_added', (snapshot) => {
       context.commit('updateTypingUser', { userId: snapshot.key, isTyping: snapshot.val() })
     })
-    getDBRef(`dialogs/${selectedDialog}/typingUsers`).on('child_changed', (snapshot) => {
+    getDBRef(dbPath.typingUsers).on('child_changed', (snapshot) => {
       context.commit('updateTypingUser', { userId: snapshot.key, isTyping: snapshot.val() })
     })
   },
 
   saveTypingUser (context, { userId, isTyping }) {
     getDBRef(`dialogs/${context.state.selectedDialog}/typingUsers`).update({ [userId]: isTyping })
+  },
+
+  resetDialogs (context) {
+    resetDialogs(context)
   }
 }
 
