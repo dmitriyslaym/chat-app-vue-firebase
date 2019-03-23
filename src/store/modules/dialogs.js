@@ -88,6 +88,10 @@ const actions = {
       if (timestampForRequestedMessages < message.timestamp) {
         context.rootState.auth.id !== message.userId && document.getElementById('notification-audio').play()
         context.commit('updateMessage', { message: { key: snapshot.key, val: { ...message, id: snapshot.key } } })
+        setTimeout(() => {
+          const messagesEl = document.getElementById('messages')
+          messagesEl.scrollTop = messagesEl.scrollHeight
+        }, 100)
       }
     })
     getDBRef(dbPath.messages).on('child_changed', (snapshot) => {
