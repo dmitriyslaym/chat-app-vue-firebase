@@ -75,8 +75,8 @@ const actions = {
         snapshot.forEach(function (childSnapshot) {
           context.commit('updateMessage', { message: { key: childSnapshot.key, val: { ...childSnapshot.val(), id: childSnapshot.key } } })
         })
+        context.commit('updateLoadedStatus', { areLoaded: true })
         setTimeout(() => {
-          context.commit('updateLoadedStatus', { areLoaded: true })
           const messagesEl = document.getElementById('messages')
           messagesEl.scrollTop = messagesEl.scrollHeight
         }, 100)
@@ -110,6 +110,7 @@ const actions = {
   },
 
   saveTypingUser (context, { userId, isTyping }) {
+    console.log('saveTypingUser isTyping', isTyping)
     getDBRef(`dialogs/${context.state.selectedDialog}/typingUsers`).update({ [userId]: isTyping })
   },
 
