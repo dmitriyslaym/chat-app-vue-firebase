@@ -100,6 +100,7 @@ export default {
 
     handleFormSubmit: function () {
       this.saveTypingUser({ userId: this.userId, isTyping: false })
+      this.currentUserIsTyping = false
       this.id ? this.updateMessage() : this.saveNewMessage()
     }
   }
