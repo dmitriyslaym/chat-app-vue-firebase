@@ -1,7 +1,7 @@
 <template>
   <div class="messages" id="messages">
 
-    <div v-if="!messagesList.length" class="messages__loader d-flex justify-content-center">
+    <div v-if="!areDialogsLoaded" class="messages__loader d-flex justify-content-center">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
       </div>
@@ -34,11 +34,6 @@
               />
             </div>
             <div v-else>
-              <!--<font-awesome-icon-->
-              <!--class="message__text-icon"-->
-              <!--icon="save"-->
-              <!--v-on:click.prevent="saveEditedMessage({ id: message.id })"-->
-              <!--/>-->
               <font-awesome-icon
                 class="message__text-icon"
                 icon="undo"
@@ -65,7 +60,8 @@ export default {
       currentUserId: state => state.auth.id,
       messagesMap: state => state.dialogs.messages,
       messagesList: state => Object.values(state.dialogs.messages).filter(message => message),
-      selectedDialog: state => state.dialogs.selectedDialog
+      selectedDialog: state => state.dialogs.selectedDialog,
+      areDialogsLoaded: state => state.dialogs.areLoaded
     })
   },
   methods: {

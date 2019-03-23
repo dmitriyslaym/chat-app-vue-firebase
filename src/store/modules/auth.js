@@ -34,6 +34,9 @@ const mutations = {
   },
   setError (state, { error }) {
     state.error = error
+  },
+  resetError (state) {
+    state.error = ''
   }
 }
 

@@ -29,12 +29,12 @@ import { getDBRef } from '../database'
 export default {
   name: 'NewMessage',
   data: () => ({
-    messageText: '',
     currentUserIsTyping: false
   }),
   computed: {
     ...mapState({
       id: state => state.messageForm.id,
+      messageText: state => state.messageForm.text,
       userName: state => state.auth.name,
       userId: state => state.auth.id,
       typingUsers: state => state.dialogs.typingUsers,
@@ -56,11 +56,10 @@ export default {
 
     afterSuccessSubmit: function () {
       this.resetFormData()
-      this.messageText = ''
     },
 
     handleInputChange: function ({ target: { value } }) {
-      this.messageText = value
+      this.updateFormData({ text: value, id: this.id })
       let needUpdateIsTyping = false
       if (!this.currentUserIsTyping && value) {
         needUpdateIsTyping = true

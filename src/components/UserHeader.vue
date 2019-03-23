@@ -16,7 +16,8 @@ export default {
     })
   },
   methods: {
-    ...mapActions('auth', ['signOut', 'resetDialogs']),
+    ...mapActions('auth', ['signOut']),
+    ...mapActions('dialogs', ['resetDialogs']),
     initLogOut: function () {
       this.signOut()
       this.resetDialogs()

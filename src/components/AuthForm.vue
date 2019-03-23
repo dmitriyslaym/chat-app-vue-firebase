@@ -27,7 +27,6 @@
     <div class="dropdown-divider"></div>
     <div v-if="mode === authMode.signIn">
       <a v-on:click.prevent="setMode(authMode.signUp)" class="dropdown-item" href="#">New around here? Sign up</a>
-      <a class="dropdown-item" href="#">Forgot password?</a>
     </div>
     <div v-else>
       <a v-on:click.prevent="setMode(authMode.signIn)" class="dropdown-item" href="#">Already have account? Sign in</a>
@@ -59,10 +58,22 @@ export default {
       error: state => state.auth.error
     })
   },
+  watch: {
+    name: function () {
+      this.resetError()
+    },
+    email: function () {
+      this.resetError()
+    },
+    password: function () {
+      this.resetError()
+    }
+  },
   methods: {
     ...mapActions('auth', ['signUpWithEmail', 'signInWithEmail']),
-    ...mapMutations('auth', ['setIsAuthorizing']),
+    ...mapMutations('auth', ['setIsAuthorizing', 'resetError']),
     setMode: function (mode) {
+      this.resetError()
       this.mode = mode
     },
     signIn: function () {
@@ -81,7 +92,10 @@ export default {
 
 <style scoped>
   .auth-error {
+    margin-top: 10px;
     border: 1px solid red;
     padding: 10px;
+    color: red;
+    font-weight: 700;
   }
 </style>

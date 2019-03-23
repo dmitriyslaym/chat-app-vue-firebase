@@ -7,13 +7,16 @@ Vue.use(Vuex)
 const state = {
   selectedDialog: '',
   messages: {},
-  typingUsers: {}
+  typingUsers: {},
+  areLoaded: false
 }
 
 const dbPath = {
   messages: '',
   typingUsers: ''
 }
+
+let timestampForRequestedMessages
 
 const mutations = {
   updateSelectedDialog: function (state, { selectedDialog }) {
@@ -35,11 +38,15 @@ const mutations = {
     state.selectedDialog = ''
     state.messages = {}
     state.typingUsers = {}
+  },
+  updateLoadedStatus: function (state, { areLoaded }) {
+    state.areLoaded = areLoaded
   }
 }
 
 function resetDialogs (context) {
   context.commit('resetDialogsData')
+  context.commit('updateLoadedStatus', { areLoaded: false })
 
   if (dbPath.messages && dbPath.typingUsers) {
     getDBRef(dbPath.messages).off('child_added')
@@ -56,15 +63,32 @@ const actions = {
   loadDialogMessages (context, { selectedDialog }) {
     resetDialogs(context)
 
+    timestampForRequestedMessages = Date.now()
     context.commit('updateSelectedDialog', { selectedDialog })
     dbPath.messages = `dialogs/${selectedDialog}/messages`
     dbPath.typingUsers = `dialogs/${selectedDialog}/typingUsers`
+
+    getDBRef(dbPath.messages).once('value', function (snapshot) {
+      if (!snapshot.hasChildren()) {
+        context.commit('updateLoadedStatus', { areLoaded: true })
+      } else {
+        snapshot.forEach(function (childSnapshot) {
+          context.commit('updateMessage', { message: { key: childSnapshot.key, val: { ...childSnapshot.val(), id: childSnapshot.key } } })
+        })
+        setTimeout(() => {
+          const messagesEl = document.getElementById('messages')
+          messagesEl.scrollTop = messagesEl.scrollHeight
+          context.commit('updateLoadedStatus', { areLoaded: true })
+        }, 100)
+      }
+    })
+
     getDBRef(dbPath.messages).on('child_added', (snapshot) => {
-      context.commit('updateMessage', { message: { key: snapshot.key, val: { ...snapshot.val(), id: snapshot.key } } })
-      setTimeout(() => {
-        const messagesEl = document.getElementById('messages')
-        messagesEl.scrollTop = messagesEl.scrollHeight
-      }, 100)
+      const message = snapshot.val()
+      if (timestampForRequestedMessages < message.timestamp) {
+        context.rootState.auth.id !== message.userId && document.getElementById('notification-audio').play()
+        context.commit('updateMessage', { message: { key: snapshot.key, val: { ...message, id: snapshot.key } } })
+      }
     })
     getDBRef(dbPath.messages).on('child_changed', (snapshot) => {
       context.commit('updateMessage', { message: { key: snapshot.key, val: { ...snapshot.val(), id: snapshot.key } } })

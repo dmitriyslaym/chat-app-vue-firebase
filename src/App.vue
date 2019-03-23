@@ -20,6 +20,10 @@
         <h3 v-else>Please select a user to start a dialog with</h3>
       </div>
     </div>
+    <audio visibility="hidden" id="notification-audio">
+      <source src="https://notificationsounds.com/soundfiles/2bb232c0b13c774965ef8558f0fbd615/file-jingle-bells-sms.ogg" type="audio/ogg">
+      <source src="https://notificationsounds.com/soundfiles/2bb232c0b13c774965ef8558f0fbd615/file-jingle-bells-sms.mp3" type="audio/mpeg">
+    </audio>
   </div>
 </template>
 
