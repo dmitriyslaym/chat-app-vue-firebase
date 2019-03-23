@@ -76,10 +76,11 @@ const actions = {
           context.commit('updateMessage', { message: { key: childSnapshot.key, val: { ...childSnapshot.val(), id: childSnapshot.key } } })
         })
         setTimeout(() => {
+          console.log('scroll to bottom')
           const messagesEl = document.getElementById('messages')
           messagesEl.scrollTop = messagesEl.scrollHeight
           context.commit('updateLoadedStatus', { areLoaded: true })
-        }, 100)
+        }, 1000)
       }
     })
 
