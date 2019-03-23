@@ -42,6 +42,7 @@ export default {
       dialogsDBPath: state => `dialogs/${state.dialogs.selectedDialog}/messages`
     }),
     namesOfTypingUsers: function () {
+      console.log('namesOfTypingUsers', this.typingUsers)
       return Object.keys(this.typingUsers).reduce((res, userId) => {
         if (!this.typingUsers[userId] || userId === this.userId) {
           return res
